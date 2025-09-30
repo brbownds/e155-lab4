@@ -21,7 +21,7 @@ void configurePLL(void) {
     RCC->PLLCFGR |=  (1 << 0);
 
     // set PLLN = 80 
-    RCC->PLLCFGR &= ~(0x7F << 8); // clearing the bits
+    RCC->PLLCFGR &= ~(0b11111111 << 8); // clearing the bits
     RCC->PLLCFGR |=  (0b1010000 << 8);
 
      // set PLLM = 1 cleaaring the bits
