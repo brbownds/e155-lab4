@@ -79,5 +79,6 @@ typedef struct
 
 void configurePLL(void);
 void configureClock(void);
+void configureFlash(void);
 
 #endif

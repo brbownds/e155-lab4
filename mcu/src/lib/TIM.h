@@ -56,7 +56,7 @@ typedef struct
 // Function prototypes 
 void delay_us(uint32_t us); 
 
-void delay_us(uint32_t ms);
+void delay_ms(uint32_t ms);
 
 void setupPWM(TIM_TypeDef *TIMx, uint32_t timer_clk, int frequency, int dutycycle); 
 
