@@ -2,52 +2,53 @@
 // brbownds@hmc.edu
 // 9/29/2025
 
-
-// STM32L432KC_RCC.c
+// RCC.c
 // Source code for RCC functions
 
 #include "RCC.h"
 
-void configurePLL() {
-    // Set clock to 80 MHz
-    // Output freq = (src_clk) * (N/M) / R
-    // (4 MHz) * (N/M) / R = 80 MHz
-    // M: XX, N: XX, R: XX
-    // Use MSI as PLLSRC
+#define FLASH_BASE   0x40022000UL
+#define FLASH_ACR   (*(volatile uint32_t *)(FLASH_BASE + 0x00))
 
-    //: Turn off PLL
-    
-    // : Wait till PLL is unlocked (e.g., off)
-    
+void configurePLL(void) {
+    // disable PLL if it’s on
+    RCC->CR &= ~(1 << 24);          // PLLON = 0
+    while (RCC->CR & (1 << 25));    // wait until PLLRDY = 0
 
-    // Load configuration
-    // : Set PLL SRC to MSI
+    // select PLL source = MSI 
+    RCC->PLLCFGR &= ~(0b11 << 0);
+    RCC->PLLCFGR |=  (0b01 << 0);
 
+    // set PLLM = 1 (
+    RCC->PLLCFGR &= ~(0b111 << 4);
 
-    // : Set PLLN
+    // set PLLN = 40 
+    RCC->PLLCFGR &= ~(0x7F << 8);
+    RCC->PLLCFGR |=  (40 << 8);
 
+    // set PLLR = 2 
+    RCC->PLLCFGR &= ~(0b11 << 25);
 
-    // : Set PLLM
-    
+    // enable PLLR output
+    RCC->PLLCFGR |= (1 << 24);      // PLLREN = 1
 
-    // : Set PLLR
-
-    
-    // : Enable PLLR output
-    
-
-    // : Enable PLL
-    
-    
-    // : Wait until PLL is locked
-    
+    // enable PLL
+    RCC->CR |= (1 << 24);           // PLLON = 1
+    while (!(RCC->CR & (1 << 25))); // wait until PLLRDY = 1
 }
 
-void configureClock(){
-    // Configure and turn on PLL
+void configureClock(void) {
+    // 80 MHz requires 4 wait states
+    FLASH_ACR &= ~0x7;      
+    FLASH_ACR |= 0x4;       
+
+    //  configure and start PLL
     configurePLL();
 
-    // Select PLL as clock source
-    RCC->CFGR |= (0b11 << 0);
-    while(!((RCC->CFGR >> 2) & 0b11));
+    // switch SYSCLK source to PLL
+    RCC->CFGR &= ~(0b11 << 0);   
+    RCC->CFGR |=  (0b11 << 0);  
+
+    // Wait
+    while (((RCC->CFGR >> 2) & 0b11) != 0b11);
 }

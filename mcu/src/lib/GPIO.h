@@ -1,4 +1,4 @@
-// STM32L432KC_GPIO.h
+// PIO.h
 // Header for GPIO functions
 
 #ifndef GPIO_H
@@ -10,22 +10,19 @@
 // Definitions
 ///////////////////////////////////////////////////////////////////////////////
 
-// Values for GPIO pins ("val" arguments)
+// Values for GPIO pins 
 #define GPIO_LOW    0
 #define GPIO_HIGH   1
 
 // Base addresses for GPIO ports
-#define GPIOB_BASE  (0x48000400UL)
+#define GPIOA_BASE  (0x48000000UL)
+#define GPIOB_BASE  (0x48000400UL) 
 
 // Arbitrary GPIO functions for pinMode()
 #define GPIO_INPUT  0
 #define GPIO_OUTPUT 1
 #define GPIO_ALT    2
 #define GPIO_ANALOG 3
-
-///////////////////////////////////////////////////////////////////////////////
-// Bitfield struct for GPIO
-///////////////////////////////////////////////////////////////////////////////
 
 // GPIO register structs here
 typedef struct {
@@ -39,12 +36,11 @@ typedef struct {
     volatile uint32_t LCKR;    // GPIO Offset 0x1C
     volatile uint32_t AFRL;    // GPIO Offset 0x20
     volatile uint32_t AFRH;    // GPIO Offset 0x24
-} GPIO;
+} GPIO_TypeDef;
 
-// Pointers to GPIO-sized chunks of memory for each peripheral
-#define GPIOB ((GPIO *) GPIOB_BASE)
-
-#define GPIO GPIOB
+// Pointers
+#define GPIOA ((GPIO_TypeDef *) GPIOA_BASE)
+#define GPIOB ((GPIO_TypeDef *) GPIOB_BASE)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Function prototypes
