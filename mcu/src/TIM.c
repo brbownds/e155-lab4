@@ -1,17 +1,20 @@
+// TIM.c
+// Timer functions for E155 Lab 4
+// Broderick Bownds
+// 9/30/2025
+
 #include "TIM.h"
 
-// Microsecond delay using TIM15
-
-void delay_us(uint32_t ms) {
+// Delay using TIM15 (basic timer)
+void delay_us(uint32_t us) {
     // Reset counter
     TIM15->CNT = 0;
 
-    // Prescaler: tick = 1 us - PSC = (timer_clk / 1MHz) - 1
-    // APB2 timer clock = 80 MHz?
+    // Prescaler: tick = 1 µs → PSC = (80 MHz / 1 MHz) - 1 = 79
     TIM15->PSC = 79;
 
-    // Auto-reload = ms
-    TIM15->ARR = ms;
+    // Auto-reload = number of microsec
+    TIM15->ARR = us;
 
     // Clear update flag
     TIM15->SR &= ~1;
@@ -22,12 +25,20 @@ void delay_us(uint32_t ms) {
     // Wait until update event flag (UIF) is set
     while (!(TIM15->SR & 1));
 
-    // Clear flag and stop
+    // Clear flag and stop counter
     TIM15->SR &= ~1;
     TIM15->CR1 &= ~1;
 }
 
-// Setup PWM on channel 1 of the given timer
+// Millisecond wrapper (optional)
+void delay_ms(uint32_t ms) {
+    while (ms--) {
+        delay_us(1000);
+    }
+}
+
+
+// Setup PWM on channel 1 of a given timer (e.g., TIM16 for audio output)
 void setupPWM(TIM_TypeDef *TIMx, uint32_t timer_clk, int frequency, int dutycycle) {
     if (frequency <= 0) return;
 
@@ -46,16 +57,16 @@ void setupPWM(TIM_TypeDef *TIMx, uint32_t timer_clk, int frequency, int dutycycl
     // PWM mode 1 (OC1M=110), enable preload
     TIMx->CCMR1 &= ~(0x7 << 4);
     TIMx->CCMR1 |=  (0x6 << 4); // PWM mode 1
-    TIMx->CCMR1 |=  (1 << 3);   // OC1PE=1
+    TIMx->CCMR1 |=  (1 << 3);   // OC1PE = 1
 
-    // Enable channel output
+    // Enable channel 1 output
     TIMx->CCER &= ~(1 << 1);
     TIMx->CCER |=  (1 << 0);
 
     // Enable ARR preload
     TIMx->CR1 |= (1 << 7);
 
-    // Main output enable (for advanced-control timers)
+    // Main output enable (BDTR.MOE) — required on TIM15/16
     TIMx->BDTR |= (1 << 15);
 
     // Generate update to latch preload
@@ -65,7 +76,7 @@ void setupPWM(TIM_TypeDef *TIMx, uint32_t timer_clk, int frequency, int dutycycl
     TIMx->CR1 |= 1;
 }
 
-// Change PWM frequency and duty cycle
+// Change PWM frequency and duty cycle (for next note)
 void changePWM(TIM_TypeDef *TIMx, uint32_t timer_clk, int frequency, int dutycycle) {
     if (frequency <= 0) return;
 
@@ -78,6 +89,6 @@ void changePWM(TIM_TypeDef *TIMx, uint32_t timer_clk, int frequency, int dutycyc
     TIMx->ARR  = period - 1;
     TIMx->CCR1 = ccr;
 
-    // Force update so new values take effect
+    // Force update so new values take effect immediately
     TIMx->EGR |= 1;
 }

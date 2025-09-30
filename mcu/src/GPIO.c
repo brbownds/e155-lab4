@@ -25,11 +25,9 @@ void pinMode(int pin, int function) {
 int digitalRead(int pin) {
     return ((GPIOA->IDR) >> pin) & 1;
 }
-
 void digitalWrite(int pin, int val) {
     GPIOA->ODR |= (1 << pin);
 }
-
 void togglePin(int pin) {
     // Use XOR to toggle
     GPIOA->ODR ^= (1 << pin);

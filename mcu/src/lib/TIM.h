@@ -54,7 +54,9 @@ typedef struct
 #define TIM16 ((TIM_TypeDef *) TIM16_BASEADD)
 
 // Function prototypes 
-void delay_us(uint32_t ms); 
+void delay_us(uint32_t us); 
+
+void delay_us(uint32_t ms);
 
 void setupPWM(TIM_TypeDef *TIMx, uint32_t timer_clk, int frequency, int dutycycle); 
 

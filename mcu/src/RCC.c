@@ -12,43 +12,39 @@
 
 void configurePLL(void) {
     // disable PLL if it’s on
-    RCC->CR &= ~(1 << 24);          // PLLON = 0
-    while (RCC->CR & (1 << 25));    // wait until PLLRDY = 0
+    
+    RCC->CR &= ~(1 << 24);          // PLLON = turn off PLL
+    while (RCC->CR >> (25 & 1)!= 0);    // wait until PLLRDY = 0
 
     // select PLL source = MSI 
-    RCC->PLLCFGR &= ~(0b11 << 0);
-    RCC->PLLCFGR |=  (0b01 << 0);
+    RCC->PLLCFGR &= ~(1 << 1);
+    RCC->PLLCFGR |=  (1 << 0);
 
-    // set PLLM = 1 (
+    // set PLLN = 80 
+    RCC->PLLCFGR &= ~(0x7F << 8); // clearing the bits
+    RCC->PLLCFGR |=  (0b1010000 << 8);
+
+     // set PLLM = 1 cleaaring the bits
     RCC->PLLCFGR &= ~(0b111 << 4);
 
-    // set PLLN = 40 
-    RCC->PLLCFGR &= ~(0x7F << 8);
-    RCC->PLLCFGR |=  (40 << 8);
-
     // set PLLR = 2 
-    RCC->PLLCFGR &= ~(0b11 << 25);
+    RCC->PLLCFGR &= ~(0b11 << 26);
+    RCC->PLLCFGR |= (1 << 25);
 
     // enable PLLR output
     RCC->PLLCFGR |= (1 << 24);      // PLLREN = 1
 
     // enable PLL
     RCC->CR |= (1 << 24);           // PLLON = 1
-    while (!(RCC->CR & (1 << 25))); // wait until PLLRDY = 1
+    while (!(RCC->CR >> 25 & 1)!=1); // wait until PLLRDY = 1
 }
 
-void configureClock(void) {
-    // 80 MHz requires 4 wait states
-    FLASH_ACR &= ~0x7;      
-    FLASH_ACR |= 0x4;       
-
+void configureClock() {
+    // 80 MHz requires 4 wait 
     //  configure and start PLL
     configurePLL();
-
     // switch SYSCLK source to PLL
-    RCC->CFGR &= ~(0b11 << 0);   
     RCC->CFGR |=  (0b11 << 0);  
-
     // Wait
     while (((RCC->CFGR >> 2) & 0b11) != 0b11);
 }
