@@ -122,8 +122,26 @@ const int notes[][2] = {
 {440,	500},
 {  0,	0}};
 
+const int star_wars_theme[][2] = {
+    {440, 500}, {440, 500}, {349, 350}, {523, 150}, // A4, A4, F4, C5
+    {440, 500}, {349, 350}, {523, 150}, {440, 1000}, // A4, F4, C5, A4
+
+    {659, 500}, {659, 500}, {659, 500},             // E5, E5, E5
+    {698, 350}, {523, 150}, {392, 500}, {349, 350}, {523, 150}, {440, 1000}, // F5, C5, G4, F4, C5, A4
+
+    {880, 500}, {440, 350}, {440, 150}, {880, 500}, // A5, A4, A4, A5
+    {830, 250}, {784, 250}, {740, 250}, {698, 250}, // G#5, G5, F#5, F5
+    {698, 125}, {698, 125},                         // F5, F5
+    {659, 250}, {587, 250}, {659, 500},             // E5, D5, E5
+
+    {392, 250}, {440, 500}, {523, 500}, {440, 500}, // G4, A4, C5, A4
+    {349, 350}, {523, 150}, {440, 1000},            // F4, C5, A4
+
+    {0, 0} // end marker
+};
+
+
 int main(void) {
-    // configure system clock (PLL to 80 MHz)
     configureFlash();
     configureClock();
 
@@ -134,13 +152,14 @@ int main(void) {
 
     // Configure PA6 = TIM16_CH1 (AF14)
     pinMode(6, GPIO_ALT);
-    GPIOA->AFRL &= ~(0xF << (6 * 4));
-    GPIOA->AFRL |=  (14 << (6 * 4));
+    GPIO->AFRL &= ~(0xF << (6 * 4));
+    GPIO->AFRL |=  (14 << (6 * 4));
 
     // Start PWM on TIM16
     const uint32_t TIMER_CLK_HZ = 80000000/80;
     setupPWM(TIM16, TIMER_CLK_HZ, 440, 50); // A4 default
 
+    // --- Play Fur Elise ---
     int song_length = sizeof(notes) / sizeof(notes[0]);
     for (int i = 0; i < song_length; i++) {
         int freq = notes[i][0];
@@ -149,8 +168,30 @@ int main(void) {
         if (dur == 0) break;
         
         if (freq == 0) {
-            // Rest: stop channel output
-            TIM16->CCER &= ~(1 << 0);
+            TIM16->CCER &= ~(1 << 0); // rest
+            delay_ms(dur);
+            TIM16->CCER |= (1 << 0);
+        } else {
+            changePWM(TIM16, TIMER_CLK_HZ, freq, 50);
+            delay_ms(dur);
+        }
+    }
+
+    // --- Pause for 2 seconds ---
+    TIM16->CCER &= ~(1 << 0);
+    delay_ms(2000);
+    TIM16->CCER |= (1 << 0);
+
+    // --- Play Star Wars ---
+    int sw_length = sizeof(star_wars_theme) / sizeof(star_wars_theme[0]);
+    for (int j = 0; j < sw_length; j++) {
+        int freq = star_wars_theme[j][0];
+        int dur  = star_wars_theme[j][1];
+
+        if (dur == 0) break;
+        
+        if (freq == 0) {
+            TIM16->CCER &= ~(1 << 0); // rest
             delay_ms(dur);
             TIM16->CCER |= (1 << 0);
         } else {
@@ -162,3 +203,5 @@ int main(void) {
     TIM16->CR1 &= ~1; // stop PWM
     while (1);
 }
+
+

@@ -1,4 +1,4 @@
-// RCC.h
+// STM32L432KC_RCC.h
 // Header for RCC functions
 
 #ifndef RCC_H
@@ -79,6 +79,5 @@ typedef struct
 
 void configurePLL(void);
 void configureClock(void);
-void configureFlash(void);
 
 #endif
