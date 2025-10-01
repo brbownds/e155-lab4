@@ -138,7 +138,7 @@ int main(void) {
     GPIOA->AFRL |=  (14 << (6 * 4));
 
     // Start PWM on TIM16
-    const uint32_t TIMER_CLK_HZ = 80000000;
+    const uint32_t TIMER_CLK_HZ = 80000000/80;
     setupPWM(TIM16, TIMER_CLK_HZ, 440, 50); // A4 default
 
     int song_length = sizeof(notes) / sizeof(notes[0]);

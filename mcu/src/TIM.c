@@ -46,7 +46,7 @@ void setupPWM(TIM_TypeDef *TIMx, uint32_t timer_clk, int frequency, int dutycycl
     uint32_t period = timer_clk / (uint32_t)frequency;
     if (period < 2) period = 2; // avoid divide by zero
 
-    TIMx->PSC = 0;
+    TIMx->PSC = 79;
     TIMx->ARR = period - 1;
 
     // Compare value = duty %
