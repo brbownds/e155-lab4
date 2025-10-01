@@ -1,7 +1,13 @@
 // TIM.c
 // Timer functions for E155 Lab 4
 // Broderick Bownds
+// brbownds@hmc.edu
 // 9/30/2025
+
+// This module contains functions to initialize PWM on a timer channel,
+// adjust frequency/duty cycle, and generate microsecond delays.
+// TIM16 is used for PWM tone generation, TIM15 is used for timing note durations.
+
 
 #include "TIM.h"
 

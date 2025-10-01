@@ -2,6 +2,10 @@
 // brbownds@hmc.edu
 // 9/29/2025
 
+// This module provides register definitions and 
+// function prototypes for setting up PWM signals 
+// (setupPWM, changePWM) and creating precise delays with TIM15 (delay_us)
+// and then converting them into milliseconds
 
 // TIM.h
 // Header for TIM16 and TIM15

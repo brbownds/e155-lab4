@@ -2,6 +2,11 @@
 // brbownds@hmc.edu
 // 9/29/2025
 
+// This main module is the application entry point for Lab 4.
+// Configures the system clock, sets up GPIO and timers, and plays 
+// songs by generating square-wave PWM signals on a speaker using 
+// TIM16 for frequency and TIM15 for duration control.
+
 // lab4_starter.c
 // Fur Elise, E155 Lab 4
 // Updated Fall 2024
